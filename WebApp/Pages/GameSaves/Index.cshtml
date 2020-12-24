@@ -1,0 +1,47 @@
+@page
+@model WebApp.Pages.GameSaves.IndexModel
+
+@{
+    ViewData["Title"] = "Game saves";
+}
+
+
+@if (Model.GameSave.Count == 0)
+{
+    <h2 class="text-center">No save games yet</h2>
+    <br/>
+    <p class="text-center">
+        <a class="btn btn-warning" asp-page="../Index">Back to main menu</a>
+    </p>
+}
+else
+{
+    <h1 class="text-center">Game saves</h1>
+    <br/>
+    <p class="text-center">
+        <a class="btn btn-warning" asp-page="../Index">Back to main menu</a>
+    </p>
+    <br/>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.GameSave[0].Name)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model.GameSave) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a class="btn btn-primary" role="button" asp-page="../GamePlay/Index" asp-route-gameId="@item.GameId" asp-route-gameSaveId="@item.GameSaveId">Load game</a> 
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+}

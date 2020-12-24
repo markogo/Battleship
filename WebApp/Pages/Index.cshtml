@@ -1,0 +1,50 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "BattleShip";
+}
+
+<div class="text-center">
+    <h1 class="display-4" style="font-family: monospace; ">Battleship</h1>
+    <br/>
+    <img src="img/battleship.jpg" style="border-style: double; width: 540px; height: 270px" alt="Battleship photo" />
+    <br/>
+    <br/>
+    <div style="background: #d7d7d7; border-radius: 40px; width: auto; margin: auto; max-width: 80%; border-style: dashed">
+        <br/>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="width: 30%">
+            Start a new game
+        </button>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body" style="background: floralwhite">
+                <form method="post">
+                    <div class="row">
+                        <div class="col">
+                            <input asp-for="Player1.Name" class="form-control" placeholder="Enter Player 1 name">
+                        </div>
+                        <div class="col">
+                            <input asp-for="Player2.Name" class="form-control" placeholder="Enter Player 2 name">
+                        </div>
+                        <div class="col">
+                            <select asp-for="GameOption.GameOptionId" class="form-control" asp-items="Model.GameOptionsSelectList"></select>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Start game</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br/>
+        <br/>
+        <a class="btn btn-primary" asp-page="./GameSaves/Index" style="width: 30%">Load game</a>
+        <br/>
+        <br/>
+        <a class="btn btn-primary" asp-page="./GameOptions/Create" style="width: 30%">Game options</a>
+        <br/>
+        <br/>
+        <a class="btn btn-primary" href="https://www.thesprucecrafts.com/the-basic-rules-of-battleship-411069" style="width: 30%">Game rules</a>
+        <br/>
+        <br/>
+    </div>
+</div>

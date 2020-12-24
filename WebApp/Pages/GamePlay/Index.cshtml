@@ -1,0 +1,351 @@
+@page
+@using Domain
+@using Domain.Enums
+@model WebApp.Pages.GamePlay.Index
+
+@functions
+{
+    string GetBoardSquareContent(BoardSquareState state, bool withShips)
+    {
+        var result = "&nbsp;";
+        if (withShips)
+        {
+            if (state.ShipId != null && state.Bomb == null)
+            {
+                result = "🚢"; // SHIP
+            }
+            else if (state.ShipId == null && state.Bomb == true)
+            {
+                result = "⭕"; // MISS
+            }
+            else if (state.ShipId != null && state.Bomb == true)
+            {
+                result = "❌"; // HIT
+            }
+            return result;
+        }
+
+        if (state.ShipId == null && state.Bomb == true)
+        {
+            result = "⭕"; // MISS
+        }
+        else if (state.ShipId != null && state.Bomb == true)
+        {
+            result = "❌"; // HIT
+        }
+
+        return result;
+    }
+
+    string GetLetter(int elementNr)
+    {
+        char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
+        for (int i = 0; i < alpha.Length; i++)
+        {
+            if (elementNr == i)
+            {
+                return alpha[i].ToString();
+            }
+        }
+        return "";
+    }
+
+    string GetBoardFlexDirectionStyle()
+    {
+        return Model.Game?.GameOption!.BoardWidth >= 15 ? "flex-direction: column" : "flex-direction: row";
+    }
+
+    string GetBoardColSize()
+    {
+        return Model.Game?.GameOption!.BoardWidth >= 15 ? "col" : "col-5";
+    }
+}
+
+@if (Model.Game?.GamePhase == GamePhaseEnum.PlacingShips)
+{
+    @if (Model.GameLogic.IsPlayer1Turn())
+    {
+        <h1 class="text-center">Place your ships @Model.GameLogic.Player1.Name</h1>
+    }
+    else
+    {
+        <h1 class="text-center">Place your ships @Model.GameLogic.Player2.Name</h1>
+    }
+    <hr>
+    <br/>
+    @if (!Model.GameLogic.IsPlayer1Turn() && Model.GameShips?.Count == 0 && Model.ShipCoordinates == null)
+    {
+        <script>alert("@Model.GameLogic.Player2.Name's turn to place ships")</script>
+    }
+    <div class="row">
+        <div class="col-2">
+            <table>
+                <form method="get">
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <div class="form-group">
+                        <label asp-for="ShipCoordinates" class="control-label">Ship coordinates for <b>@(Model.ShipBeingPlaced!.Name)(@(Model.ShipBeingPlaced.Size))</b></label>
+                        <input name="shipcoordinates" id="shipcoordinates" value="@Model.ShipCoordinates" placeholder="Example A,1-B,1" class="form-control"/>
+                        <input name="gameId" id="gameId" value="@Model.Game?.GameId" type="hidden"/>
+                        <span asp-validation-for="@Model.ShipCoordinates" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-primary" value="Place ship" type="submit"/>
+                    </div>
+                </form>
+            </table>
+            @if (Model.GameShips!.Count == Model.GetTotalAmountOfShipsForOnePlayer() || !Model.GameShips!.Any())
+            {
+                <form method="get">
+                    <div class="form-group">
+                        <input name="gameId" id="gameId" value="@Model.Game?.GameId" type="hidden"/>
+                        <input name="placeShipsRandomly" id="placeShipsRandomly" value="true" type="hidden"/>
+                        <input class="btn btn-warning" value="Place ships randomly" type="submit"/>
+                    </div>
+                </form>
+            }
+        </div>
+        <div class="col-8 text-center">
+            <table class="table table-bordered">
+                @for (var y = 0; y < Model.GameLogic.BoardHeight; y++)
+                {
+                    @if (y == 0)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success borderless">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                    <tr>
+                        @for (var x = 0; x < Model.GameLogic.BoardWidth; x++)
+                        {
+                            @if (x == 0)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                            <td>
+                                @Html.Raw(GetBoardSquareContent(Model.GameLogic.GetBoardSquareState(Model.GameLogic.GetActivePlayerBoard(), x, y), true))
+                            </td>
+                            @if (x == Model.GameLogic.BoardWidth - 1)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                        }
+                    </tr>
+                    @if (y == Model.GameLogic.BoardHeight - 1)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                }
+            </table>
+        </div>
+        <div class="col-2"></div>
+    </div>
+}
+else if (Model.Game?.GamePhase == GamePhaseEnum.Bombing)
+{
+    @if (Model.TurnChange)
+    {
+        <script>alert("@Model.ActionMessage\nGive controls to opponent!")</script>
+    }
+    @if (Model.GameLogic.IsPlayer1Turn() && Model.SaveGame != true && Model.LoadGame != true && Model.UndoMove != true && Model.GameShips!.Count == Model.GetTotalAmountOfShipsForOnePlayer()
+         && Model.Game?.Player1!.PlayerBoardStates!.Count == 0 && Model.Game?.Player2!.PlayerBoardStates!.Count == 0)
+    {
+        <script>alert("Phase 2:\nGive controls to opponent and start bombing!")</script>
+    }
+    <div class="row align-items-center justify-content-center">
+        <div class="col">
+            <div class="text-center">
+                <button class="btn btn-primary" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false">Save game</button>
+                <button class="btn btn-warning" onclick="window.location.href='?undoMove=true&gameId=@Model.Game?.GameId'">Undo move</button>
+                <button class="btn btn-danger" onclick="window.location.href='/'">Exit game</button>
+                <div class="row">
+                    <div class="col">
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body border-primary" style="width: 45.2%; background: #b8daff;">
+                                <form method="get">
+                                    <div class="row">
+                                        <div class="col">
+                                            <input asp-for="GameSave!.Name" class="form-control" placeholder="Enter save game name">
+                                            <input name="gameId" id="gameId" value="@Model.Game?.GameId" type="hidden"/>
+                                            <input name="saveGame" id="saveGame" value="true" type="hidden"/>
+                                        </div>
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (Model.ActionMessage != null)
+    {
+        <br/>
+        <div class="row align-items-center justify-content-center">
+            <div class="col">
+                <h3 class="text-center">@Model.ActionMessage</h3>
+            </div>
+        </div>
+    }
+    <hr/>
+    <br/>
+    <div class="row" style="display: flex; @GetBoardFlexDirectionStyle()">
+        <div class="@GetBoardColSize()">
+            @if (Model.GameLogic.IsPlayer1Turn())
+            {
+                <h2 class="text-center">@Model.Game!.Player1!.Name's board</h2>
+            }
+            else
+            {
+                <h2 class="text-center">@Model.Game!.Player2!.Name's board</h2>
+            }
+            <table class="table table-bordered">
+                @for (var y = 0; y < Model.GameLogic.BoardHeight; y++)
+                {
+                    @if (y == 0)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success borderless">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                    <tr>
+                        @for (var x = 0; x < Model.GameLogic.BoardWidth; x++)
+                        {
+                            @if (x == 0)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                            <td>
+                                @Html.Raw(GetBoardSquareContent(Model.GameLogic.GetBoardSquareState(Model.GameLogic.GetActivePlayerBoard(), x, y), true))
+                            </td>
+                            @if (x == Model.GameLogic.BoardWidth - 1)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                        }
+                    </tr>
+                    @if (y == Model.GameLogic.BoardHeight - 1)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                }
+            </table>
+        </div>
+        @if (GetBoardColSize() == "col")
+        {
+            <br/>
+        }
+        else
+        {
+            <div class="col-2"></div>
+        }
+        <div class="@GetBoardColSize()">
+            @if (Model.GameLogic.IsPlayer1Turn())
+            {
+                <h2 class="text-center">@Model.Game!.Player2!.Name's board</h2>
+            }
+            else
+            {
+                <h2 class="text-center">@Model.Game!.Player1!.Name's board</h2>
+            }
+            <table class="table table-bordered">
+                @for (var y = 0; y < Model.GameLogic.BoardHeight; y++)
+                {
+                    @if (y == 0)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success borderless">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                    <tr>
+                        @for (var x = 0; x < Model.GameLogic.BoardWidth; x++)
+                        {
+                            @if (x == 0)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                            <td onclick="window.location.href='?x=@x&y=@y&gameId=@Model.Game?.GameId'" style="cursor: pointer">
+                                @Html.Raw(GetBoardSquareContent(Model.GameLogic.GetBoardSquareState(Model.GameLogic.GetNonActivePlayerBoard(), x, y), false))
+                            </td>
+                            @if (x == Model.GameLogic.BoardWidth - 1)
+                            {
+                                <th class="table-primary">@(y + 1)</th>
+                            }
+                        }
+                    </tr>
+                    @if (y == Model.GameLogic.BoardHeight - 1)
+                    {
+                        @for (var x = 0; x <= Model.GameLogic.BoardWidth + 1; x++)
+                        {
+                            @if (x == 0 || x == Model.GameLogic.BoardWidth + 1)
+                            {
+                                <th class="table-info"></th>
+                            }
+                            else
+                            {
+                                <th class="table-success">@GetLetter(x - 1)</th>
+                            }
+                        }
+                    }
+                }
+            </table>
+        </div>
+    </div>
+} else
+{
+    <script>
+        alert("Game over!\nThe winner is @Model.Winner!.Name!")
+        window.location.href="/"
+    </script>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

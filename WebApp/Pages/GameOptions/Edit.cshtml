@@ -1,0 +1,55 @@
+@page
+@model WebApp.Pages.GameOptions.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>GameOption</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="GameOption.GameOptionId" />
+            <div class="form-group">
+                <label asp-for="GameOption.Name" class="control-label"></label>
+                <input asp-for="GameOption.Name" class="form-control" />
+                <span asp-validation-for="GameOption.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GameOption.BoardWidth" class="control-label"></label>
+                <input asp-for="GameOption.BoardWidth" class="form-control" />
+                <span asp-validation-for="GameOption.BoardWidth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GameOption.BoardHeight" class="control-label"></label>
+                <input asp-for="GameOption.BoardHeight" class="form-control" />
+                <span asp-validation-for="GameOption.BoardHeight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GameOption.CanShipsTouchEnum" class="control-label"></label>
+                <select asp-for="GameOption.CanShipsTouchEnum" class="form-control"></select>
+                <span asp-validation-for="GameOption.CanShipsTouchEnum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GameOption.NextMoveAfterHitEnum" class="control-label"></label>
+                <select asp-for="GameOption.NextMoveAfterHitEnum" class="form-control"></select>
+                <span asp-validation-for="GameOption.NextMoveAfterHitEnum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

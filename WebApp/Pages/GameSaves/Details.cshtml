@@ -1,0 +1,37 @@
+@page
+@model WebApp.Pages.GameSaves.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>GameSave</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameSave.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameSave.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameSave.Game)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameSave.Game!.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.GameSave.SerializedGame)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.GameSave.SerializedGame)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.GameSave.GameSaveId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

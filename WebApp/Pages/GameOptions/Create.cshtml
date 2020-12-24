@@ -1,0 +1,86 @@
+@page
+@using Domain.Enums
+@model WebApp.Pages.GameOptions.CreateModel
+
+@{
+    ViewData["Title"] = "Game options";
+}
+
+<h1 class="text-center">Create new game options</h1>
+
+<hr/>
+<div class="container align-content-center">
+    <form method="post">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="GameOption.Name" class="control-label">Name of new settings</label>
+                    <input asp-for="GameOption.Name" class="form-control"/>
+                    <span asp-validation-for="GameOption.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="GameOption.BoardWidth" class="control-label">Board width</label>
+                    <input asp-for="GameOption.BoardWidth" class="form-control"/>
+                    <span asp-validation-for="GameOption.BoardWidth" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="GameOption.BoardHeight" class="control-label">Board height</label>
+                    <input asp-for="GameOption.BoardHeight" class="form-control"/>
+                    <span asp-validation-for="GameOption.BoardHeight" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="GameOption.CanShipsTouchEnum" class="control-label">Can ships touch on the board?</label>
+                    <select asp-for="GameOption.CanShipsTouchEnum" asp-items="Html.GetEnumSelectList<CanShipsTouchEnum>()" class="form-control"></select>
+                    <span asp-validation-for="GameOption.CanShipsTouchEnum" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="GameOption.NextMoveAfterHitEnum" class="control-label">Who's turn is it after a successful hit?</label>
+                    <select asp-for="GameOption.NextMoveAfterHitEnum" asp-items="Html.GetEnumSelectList<NextMoveAfterHitEnum>().OrderByDescending(o => o.Value)" class="form-control"></select>
+                    <span asp-validation-for="GameOption.NextMoveAfterHitEnum" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary"/>
+                </div>
+                
+                <div class="form-group">
+                    <a class="btn btn-warning" asp-page="../Index">Back to main menu</a>
+                </div>
+                
+            </div>
+            
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="Carrier.Amount" class="control-label">Amount of Carriers(Size: 5)</label>
+                    <input asp-for="Carrier.Amount" value="1" class="form-control"/>
+                    <span asp-validation-for="Carrier.Amount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Battleship.Amount" class="control-label">Amount of Battleships(Size: 4)</label>
+                    <input asp-for="Battleship.Amount" value="1" class="form-control"/>
+                    <span asp-validation-for="Battleship.Amount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Cruiser.Amount" class="control-label">Amount of Cruisers(Size: 3)</label>
+                    <input asp-for="Cruiser.Amount" value="1" class="form-control"/>
+                    <span asp-validation-for="Cruiser.Amount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Submarine.Amount" class="control-label">Amount of Submarines(Size: 2)</label>
+                    <input asp-for="Submarine.Amount" value="1" class="form-control"/>
+                    <span asp-validation-for="Submarine.Amount" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Destroyer.Amount" class="control-label">Amount of Destroyers(Size: 1)</label>
+                    <input asp-for="Destroyer.Amount" value="1" class="form-control"/>
+                    <span asp-validation-for="Destroyer.Amount" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
