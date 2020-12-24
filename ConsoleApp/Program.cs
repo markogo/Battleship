@@ -80,7 +80,7 @@ namespace ConsoleApp
 
             Console.ForegroundColor = ConsoleColor.Red;
             
-            Console.WriteLine("=========> BATTLESHIPS MAGORD <============");
+            Console.WriteLine("=========> BATTLESHIPS <============");
 
             var menuA = new Menu(MenuLevel.Level1);
             menuA.AddMenuItem(new MenuItem("New game", "N", StartNewGame));

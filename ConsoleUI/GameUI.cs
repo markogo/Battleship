@@ -196,26 +196,26 @@ namespace ConsoleUI
             {
                 if (state.ShipId != null && state.Bomb == null)
                 {
-                    return " 🚢" ; // SHIP
+                    return " S " ; // SHIP
                 }
                 if (state.ShipId == null && state.Bomb == true)
                 {
-                    return " ⭕ "; // MISS️
+                    return " O "; // MISS️
                 }
                 if (state.ShipId != null && state.Bomb == true)
                 {
-                    return " ❌ "; // HIT
+                    return " X "; // HIT
                 }
                 return "   ";
             }
 
             if (state.ShipId == null && state.Bomb == true)
             {
-                return " ⭕ "; // MISS
+                return " O "; // MISS
             }
             if (state.ShipId != null && state.Bomb == true)
             {
-                return " ❌ "; // HIT
+                return " X "; // HIT
             }
             return "   ";
         }
